@@ -92,14 +92,22 @@ class DialogueCutscene extends Cutscene {
 					nextSound: node.has.nextSound ? FlxG.sound.load(Paths.sound(node.att.nextSound)) : null,
 					textSound: null
 				};
-
-				if(node.has.textSound) line.textSound = FlxG.sound.load(Paths.sound(node.att.textSound));
-				else if(!useDef) {
-					var char:DialogueCharacter = charMap[line.char];
-					if(char != null && char.charData != null && char.charData.has.textSound)
-						line.textSound = FlxG.sound.load(Paths.sound(char.charData.att.textSound));
+				
+				// Try loading the text sound from the node first
+				var textSoundPath = node.has.textSound ? Paths.sound(node.att.textSound) : null;
+				
+				// If no node-specific text sound, check for character-specific sound
+				if (textSoundPath == null && !useDef) {
+				    var char = charMap[line.char];
+				    if (char != null && char.charData != null && char.charData.has.textSound) {
+				        textSoundPath = Paths.sound(char.charData.att.textSound);
+				    }
 				}
-
+				
+				// If we found a valid text sound path, load the sound
+				if (textSoundPath != null) {
+				    line.textSound = FlxG.sound.load(textSoundPath);
+				}
 				dialogueLines.push(line);
 			}
 
